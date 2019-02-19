@@ -50,38 +50,38 @@ type GPIO struct {
 
 // PinMode sets pin mode
 func (c *GPIO) PinMode(pin int, mode PinMode) {
-	C.pinMode(pin, mode)
+	C.pinMode(C.int(pin), C.int(mode))
 }
 
 // Pull sets pull up/down mode
 func (c *GPIO) Pull(pin int, mode PullMode) {
-	C.pullUpDnControl(pin, mode)
+	C.pullUpDnControl(C.int(pin), C.int(mode))
 }
 
 // DigitalWrite writes digital value to pin
 func (c *GPIO) DigitalWrite(pin int, val DigitalValue) {
-	C.digitalWrite(pin, val)
+	C.digitalWrite(C.int(pin), C.int(val))
 }
 
 // PWMSetRange set PWM generator range
 // defaults to 1024
-func (c *GPIO) PWMSetRange(val int) {
-	C.pwmSetRange(val)
+func (c *GPIO) PWMSetRange(val uint) {
+	C.pwmSetRange(C.uint(val))
 }
 
 // PWMSetClock sets the divisor of PWM clock
 func (c *GPIO) PWMSetClock(val int) {
-	C.pwmSetClock(val)
+	C.pwmSetClock(C.int(val))
 }
 
 // PWMWrite writes pwn value
 func (c *GPIO) PWMWrite(pin int, val int) {
-	C.pwmWrite(pin, val)
+	C.pwmWrite(C.int(pin), C.int(val))
 }
 
 // DigitalRead reads digital value
 func (c *GPIO) DigitalRead(pin int) DigitalValue {
-	return C.digitalRead(pin)
+	return DigitalValue(C.digitalRead(C.int(pin)))
 }
 
 // Setup setup the GPIO interface
@@ -89,19 +89,19 @@ func Setup(method SetupMethod) (*GPIO, error) {
 	if loaded {
 		panic("wiring pi is already loaded")
 	}
-	var res int
+	var ret C.int
 	switch method {
 	case WiringPiSetup:
-		res = c.wiringPiSetup()
+		ret = C.wiringPiSetup()
 	case BroadcomSetup:
-		res = c.wiringPiSetupGpio()
+		ret = C.wiringPiSetupGpio()
 	case PhysSetup:
-		res = c.wiringPiSetupPhys()
+		ret = C.wiringPiSetupPhys()
 	case SysSetup:
-		res = c.wiringPiSetupSys()
+		ret = C.wiringPiSetupSys()
 	}
 	if ret != 0 {
-		return nil, RetCode{ret}
+		return nil, RetCode{int(ret)}
 	}
 	loaded = true
 	return &GPIO{

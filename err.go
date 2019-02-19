@@ -7,7 +7,7 @@ type RetCode struct {
 	Code int
 }
 
-func (c *RetCode) Error() string {
+func (c RetCode) Error() string {
 	return fmt.Sprintf("operation failed to complete. retcode: %d", c.Code)
 }
 
